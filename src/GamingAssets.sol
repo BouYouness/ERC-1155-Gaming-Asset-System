@@ -64,7 +64,7 @@ contract GamingAssets is ERC1155, Ownable, Pausable, ERC1155Burnable, AccessCont
         super.safeTransferFrom(from, to, id, amount, data);
     }
 
-    //banch transfer
+    //batch transfer
     function safeBatchTransferFrom(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
     public
     override

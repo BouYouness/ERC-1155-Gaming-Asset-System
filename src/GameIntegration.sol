@@ -21,33 +21,32 @@ contract GameIntegration is AccessControl {
     
     //Function to transfer an asset with game-specific logic 
     function transferAsset(address from, address to, uint256 id, uint256 amount, bytes memory data) external onlyRole(GAME_MANAGER_ROLE){
-        // check cooldown 
-        require(block.timestamp - lastTransferTime[from][id] >= transferCooldown,"Transfer cooldown period not met");
 
-        //Ensure sender's balance is sufficient  
+        //check conditions
+        require(block.timestamp - lastTransferTime[from][id] >= transferCooldown,"Transfer cooldown period not met"); 
         require(gamingAssets.balanceOf(from, id) >= amount, "Insufficient balance");
 
-        //update last transfer time
+        //Update state (update last transfer time)
         lastTransferTime[from][id] = block.timestamp;
 
-        //Perform the asset Transfer 
+        //Interact with other contracts (Perform the asset Transfer)
         gamingAssets.safeTransferFrom(from, to, id, amount, data);
     }
 
     //Function to batch transfer assets with game-specific logic 
     function transferBatchAssets(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data )external onlyRole(GAME_MANAGER_ROLE){
+        // check conditions
        for(uint256 i=0; i< ids.length ;i++){
-         //check cooldown for each asset 
          require(block.timestamp - lastTransferTime[from][ids[i]] >= transferCooldown, "ransfer cooldown period not met for one of the assets");
-
-         //Ensure balance is sufficient
          require(gamingAssets.balanceOf(from, ids[i]) >= amounts[i], "Insufficient balance for one of the assets");
-
-         //update last transfer time for each asset
-         lastTransferTime[from][ids[i]] = block.timestamp;
        }
 
-       //perform the batch asset transfer 
+        // Update state
+        for (uint256 i = 0; i < ids.length; i++) {
+            lastTransferTime[from][ids[i]] = block.timestamp;
+        }
+
+       // Interact with other contracts (perform the batch asset transfer) 
        gamingAssets.safeBatchTransferFrom(from, to, ids, amounts, data);
     }
 
